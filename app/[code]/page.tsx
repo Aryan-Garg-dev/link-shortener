@@ -1,5 +1,5 @@
 import React from 'react'
-import { getLink, updateCount } from "@/lib/actions/server";
+import { getLink, updateClickCount } from "@/lib/actions/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
 import { withCache } from "@/lib/utils/cache";
