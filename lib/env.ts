@@ -11,7 +11,7 @@ function getEnv(name: string, defaultValue?: string): string {
 
 export default {
   MONGO_URI: getEnv("MONGO_URI"),
-  BASE_URL: getEnv("BASE_URL", "http://localhost:3000"),
+  NEXT_PUBLIC_BASE_URL: getEnv("NEXT_PUBLIC_BASE_URL", "http://localhost:3000"),
   UPSTASH_REDIS_REST_URL: getEnv("UPSTASH_REDIS_REST_TOKEN"),
   UPSTASH_REDIS_REST_TOKEN: getEnv("UPSTASH_REDIS_REST_TOKEN"),
 }

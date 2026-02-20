@@ -1,6 +1,6 @@
 import env from "@/lib/env";
 
-const SHORTENER_HOST = new URL(env.BASE_URL).hostname.toLowerCase();
+const SHORTENER_HOST = new URL(env.NEXT_PUBLIC_BASE_URL).hostname.toLowerCase();
 
 export const isPrivateHost = (hostname: string) => {
   return (

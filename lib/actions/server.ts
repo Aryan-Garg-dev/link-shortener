@@ -23,7 +23,7 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
 
   const data = await LinkModel.findOne({ url: url });
   if (!!data) return {
-    shortLink: `${env.BASE_URL}/${data.code}`,
+    shortLink: `${env.NEXT_PUBLIC_BASE_URL}/${data.code}`,
     clicks: data.clicks
   };
 
