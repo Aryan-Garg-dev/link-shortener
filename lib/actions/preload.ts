@@ -19,6 +19,10 @@ export function ensurePreload() {
 export async function getCachedLink(code: string) {
   "use server";
 
+  if (Math.random() < 0.01) {
+    console.log("LocalCache:", localCache.stats());
+  }
+
   ensurePreload();
   return _getCachedLink(code);
 }
