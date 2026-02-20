@@ -20,7 +20,7 @@ export default async function Page({ params }: PageProps) {
     ttl: CACHE_TTL.link
   })(code);
 
-  void updateCount(code);
+  void updateClickCount(code);
 
   if (!link) {
     return (

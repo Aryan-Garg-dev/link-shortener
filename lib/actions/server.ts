@@ -58,6 +58,6 @@ export const getLink = async (code: string) => {
   return data.url;
 }
 
-export const updateCount = async (code: string) => {
+export const updateClickCount = async (code: string) => {
   await LinkModel.updateOne({ code }, { $inc: { clicks: 1 } });
 }
