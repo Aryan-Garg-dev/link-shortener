@@ -18,7 +18,7 @@ export function ensurePreload() {
 
 export async function getCachedLink(code: string) {
   "use server";
-  console.log("LocalCache:", localCache.stats());
+
   ensurePreload();
   return _getCachedLink(code);
 }
