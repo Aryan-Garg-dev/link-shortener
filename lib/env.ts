@@ -1,0 +1,17 @@
+function getEnv(name: string, defaultValue?: string): string {
+  const value = process.env[name];
+  if (value === undefined) {
+    if (defaultValue !== undefined) {
+      return defaultValue;
+    }
+    throw new Error(`Environment variable ${name} not found`);
+  }
+  return value;
+}
+
+export default {
+  MONGO_URI: getEnv("MONGO_URI"),
+  BASE_URL: getEnv("BASE_URL", "http://localhost:3000"),
+  UPSTASH_REDIS_REST_URL: getEnv("UPSTASH_REDIS_REST_TOKEN"),
+  UPSTASH_REDIS_REST_TOKEN: getEnv("UPSTASH_REDIS_REST_TOKEN"),
+}
