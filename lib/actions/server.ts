@@ -4,8 +4,9 @@ import { LinkModel } from "@/lib/db/model";
 import env from "@/lib/env";
 import { generateCode } from "@/lib/utils/shortener";
 import { isValidPublicUrl, normalizeUrl, resolvesToSelf } from "@/lib/utils/validations";
-import { CACHE_KEY_PREFIX, CACHE_TTL } from "@/lib/constants";
+import { CACHE_KEY_PREFIX, CACHE_LINK_OPTIONS, CACHE_TTL } from "@/lib/constants";
 import { redis } from "@/lib/redis";
+import { localCache, withCache } from "@/lib/cache";
 
 export interface GetOrCreateShortLinkResponse {
   shortLink: string;
@@ -21,7 +22,7 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
 
   if (await resolvesToSelf(url)) return new Error("URL redirects back to this service");
 
-  const data = await LinkModel.findOne({ url: url });
+  const data = await LinkModel.findOne({ url: url }, { projection: { code: 1, clicks: 1 } });
   if (!!data) return {
     shortLink: `${env.NEXT_PUBLIC_BASE_URL}/${data.code}`,
     clicks: data.clicks
@@ -52,10 +53,25 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
   }
 }
 
-export const getLink = async (code: string) => {
-  const data = await LinkModel.findOne({ code });
+export const getLink = withCache(async (code: string) => {
+  const data = await LinkModel.findOne({ code }, { projection: { url: 1 } });
   if (!data) return null;
   return data.url;
+}, CACHE_LINK_OPTIONS);
+
+export const preloadPopularLinksToLocalCache = async () => {
+  const popular = await LinkModel.find()
+    .sort({ clicks: -1 })
+    .limit(1000)
+    .project({ code: 1, url: 1 })
+    .toArray();
+
+  localCache.preload(
+    popular.map(l => ({
+      key: `${CACHE_KEY_PREFIX.link}:${l.code}`,
+      value: l.url
+    }))
+  );
 }
 
 export const updateClickCount = async (code: string) => {

@@ -1,9 +1,8 @@
 import React from 'react'
-import { getLink, updateClickCount } from "@/lib/actions/server";
+import { updateClickCount } from "@/lib/actions/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
-import { withCache } from "@/lib/utils/cache";
-import { CACHE_KEY_PREFIX, CACHE_TTL } from "@/lib/constants";
+import { getCachedLink } from "@/lib/actions/preload";
 
 interface PageProps {
   params: Promise<{
@@ -14,11 +13,7 @@ interface PageProps {
 export default async function Page({ params }: PageProps) {
   const { code } = await params;
 
-  const link = await withCache(getLink, {
-    prefix: CACHE_KEY_PREFIX.link,
-    keyResolver: (code) => code,
-    ttl: CACHE_TTL.link
-  })(code);
+  const link = await getCachedLink(code);
 
   void updateClickCount(code);
 
