@@ -55,6 +55,9 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
 export const getLink = async (code: string) => {
   const data = await LinkModel.findOne({ code });
   if (!data) return null;
-  LinkModel.updateOne({ code }, { $inc: { clicks: 1 } }).catch(() => {});
   return data.url;
+}
+
+export const updateCount = async (code: string) => {
+  await LinkModel.updateOne({ code }, { $inc: { clicks: 1 } });
 }

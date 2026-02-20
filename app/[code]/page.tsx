@@ -1,5 +1,5 @@
 import React from 'react'
-import { getLink } from "@/lib/actions/server";
+import { getLink, updateCount } from "@/lib/actions/server";
 import { redirect } from "next/navigation";
 import Link from 'next/link';
 import { withCache } from "@/lib/utils/cache";
@@ -19,6 +19,8 @@ export default async function Page({ params }: PageProps) {
     keyResolver: (code) => code,
     ttl: CACHE_TTL.link
   })(code);
+
+  void updateCount(code);
 
   if (!link) {
     return (
