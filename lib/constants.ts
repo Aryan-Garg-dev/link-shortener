@@ -11,3 +11,9 @@ export const CACHE_LINK_OPTIONS = {
   keyResolver: (code: string) => code,
   ttl: CACHE_TTL.link
 }
+
+export const CACHE_METADATA_OPTIONS = {
+  prefix: "meta",
+  keyResolver: (url: string) => url,
+  ttl: 60 * 60 * 24
+}
