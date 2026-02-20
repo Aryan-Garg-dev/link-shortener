@@ -42,7 +42,7 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
       });
 
       return {
-        shortLink: `${env.BASE_URL}/${code}`,
+        shortLink: `${env.NEXT_PUBLIC_BASE_URL}/${code}`,
         clicks: 0
       };
     } catch(err: any){
