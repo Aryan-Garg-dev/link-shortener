@@ -32,6 +32,7 @@ export async function GET(req: Request){
       {
         status: 200,
         headers: {
+          "Content-Type": "application/json",
           "Cache-Control": "no-store",
         },
       }
@@ -48,6 +49,7 @@ export async function GET(req: Request){
       {
         status: 500,
         headers: {
+          "Content-Type": "application/json",
           "Cache-Control": "no-store",
         },
       }
