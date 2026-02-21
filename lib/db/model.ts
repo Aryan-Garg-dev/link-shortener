@@ -1,5 +1,5 @@
-import { ObjectId } from "mongodb";
-import { db } from "@/lib/db/index";
+import { Collection, ObjectId } from "mongodb";
+import { getDB } from "@/lib/db/index";
 
 export interface Link {
   _id?: ObjectId;
@@ -8,4 +8,7 @@ export interface Link {
   clicks: number;
 }
 
-export const LinkModel = db.collection<Link>("links");
+export async function getLinkModel(): Promise<Collection<Link>> {
+  const db = await getDB();
+  return db.collection<Link>("links");
+}

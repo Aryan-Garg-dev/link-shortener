@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "db:index": "tsx scripts/db/indexes.ts",
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm run db:index && next build",
     "start": "next start",
     "lint": "eslint"
   },

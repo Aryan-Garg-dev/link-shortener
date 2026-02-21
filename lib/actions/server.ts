@@ -1,6 +1,6 @@
 "use server"
 
-import { LinkModel } from "@/lib/db/model";
+import { getLinkModel } from "@/lib/db/model";
 import env from "@/lib/env";
 import { generateCode } from "@/lib/utils/shortener";
 import { isValidPublicUrl, normalizeUrl, resolvesToSelf } from "@/lib/utils/validations";
@@ -14,6 +14,8 @@ export interface GetOrCreateShortLinkResponse {
 }
 
 export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShortLinkResponse | Error> => {
+  const LinkModel = await getLinkModel();
+
   url = url.trim();
 
   if (!isValidPublicUrl(url)) return new Error("Invalid or unsafe URL");
@@ -54,12 +56,16 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
 }
 
 export const getLink = withCache(async (code: string) => {
+  const LinkModel = await getLinkModel();
+
   const data = await LinkModel.findOne({ code }, { projection: { url: 1 } });
   if (!data) return null;
   return data.url;
 }, CACHE_LINK_OPTIONS);
 
 export const preloadPopularLinksToLocalCache = async () => {
+  const LinkModel = await getLinkModel();
+
   const popular = await LinkModel.find()
     .sort({ clicks: -1 })
     .limit(1000)
@@ -75,5 +81,7 @@ export const preloadPopularLinksToLocalCache = async () => {
 }
 
 export const updateClickCount = async (code: string) => {
+  const LinkModel = await getLinkModel();
+
   await LinkModel.updateOne({ code }, { $inc: { clicks: 1 } });
 }
