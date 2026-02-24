@@ -35,7 +35,8 @@ export async function getDB(): Promise<Db> {
 
     void linksCollection.createIndexes([
       { key: { code: 1 }, name: "unique_code", unique: true },
-      { key: { url: 1 }, name: "unique_url", unique: true }
+      { key: { url: 1 }, name: "unique_url", unique: true },
+      { key: { createdAt: -1 } }
     ]).catch((err) => {
       console.error("Index creation failed:", err);
       global.mongoIndexesInitialized = false;

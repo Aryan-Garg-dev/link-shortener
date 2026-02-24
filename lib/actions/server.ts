@@ -37,7 +37,8 @@ export const getOrCreateShortLink = async (url: string): Promise<GetOrCreateShor
       await LinkModel.insertOne({
         code,
         url,
-        clicks: 0
+        clicks: 0,
+        createdAt: new Date()
       });
 
       await redis.set(`${CACHE_KEY_PREFIX.link}:${code}`, url, {
@@ -63,14 +64,17 @@ export const getLink = withCache(async (code: string) => {
   return data.url;
 }, CACHE_LINK_OPTIONS);
 
-export const preloadPopularLinksToLocalCache = async () => {
+export const getPopularLinks = async (limit: number)=> {
   const LinkModel = await getLinkModel();
-
-  const popular = await LinkModel.find()
+  return LinkModel.find()
     .sort({ clicks: -1 })
-    .limit(1000)
+    .limit(limit)
     .project({ code: 1, url: 1 })
     .toArray();
+}
+
+export const preloadPopularLinksToLocalCache = async () => {
+  const popular = await getPopularLinks(1000);
 
   localCache.preload(
     popular.map(l => ({
@@ -84,4 +88,65 @@ export const updateClickCount = async (code: string) => {
   const LinkModel = await getLinkModel();
 
   await LinkModel.updateOne({ code }, { $inc: { clicks: 1 } });
+}
+
+
+export type AnalyticsParams = {
+  topLimit?: number;
+  from?: Date;
+  to?: Date;
+};
+
+export const getAnalytics = async (params: AnalyticsParams = {}) => {
+  const LinkModel = await getLinkModel();
+
+  const topLimit = Math.min(Math.max(params.topLimit ?? 5, 1), 50);
+
+  const now = new Date();
+  const from = params.from ?? new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const to = params.to ?? now;
+
+  const [result] = await LinkModel.aggregate([
+    {
+      $facet: {
+        overview: [
+          {
+            $group: {
+              _id: null,
+              totalLinks: { $sum: 1 },
+              totalClicks: { $sum: "$clicks" }
+            }
+          }
+        ],
+
+        todayLinks: [
+          { $match: { createdAt: { $gte: from, $lte: to } } },
+          { $count: "count" }
+        ],
+
+        topLinks: [
+          { $sort: { clicks: -1 } },
+          { $limit: topLimit },
+          {
+            $project: {
+              _id: 0,
+              code: 1,
+              url: 1,
+              clicks: 1,
+              createdAt: 1
+            }
+          }
+        ]
+      }
+    }
+  ]).toArray();
+
+  return {
+    totalLinks: result?.overview?.[0]?.totalLinks ?? 0,
+    totalClicks: result?.overview?.[0]?.totalClicks ?? 0,
+    linksInRange: result?.todayLinks?.[0]?.count ?? 0,
+    topLinks: result?.topLinks ?? [],
+    range: { from, to }
+  };
+
 }

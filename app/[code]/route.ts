@@ -15,6 +15,8 @@ export async function GET(
 
     void updateClickCount(code);
 
+    // 301 -> Permanent Redirect (Cached by Browser and DNS, No req hit req, Less Compute, Not allow analytics)
+    // 302 -> Temporary Redirect (Not Cached, Always req hit req, More Compute, Allow analytics)
     return NextResponse.redirect(url, 302);
   } catch (err) {
     console.error("Redirect error:", err);

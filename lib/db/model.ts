@@ -6,6 +6,7 @@ export interface Link {
   code: string;
   url: string;
   clicks: number;
+  createdAt: Date;
 }
 
 export async function getLinkModel(): Promise<Collection<Link>> {

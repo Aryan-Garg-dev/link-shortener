@@ -1,10 +1,11 @@
 import { getDB } from "@/lib/db";
 import { redis } from "@/lib/redis";
+import env from "@/lib/env";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: Request){
-  if (req.headers.get("x-health-key") !== process.env.HEALTH_SECRET)
+  if (req.headers.get("x-health-key") !== env.HEALTH_SECRET)
     return new Response("Unauthorized", { status: 401 });
 
   const start = Date.now();
